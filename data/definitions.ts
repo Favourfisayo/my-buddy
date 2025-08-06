@@ -3,7 +3,13 @@ import { UUID } from "node:crypto"
 export type User = {
     id: UUID,
     email: string,
-    password: string
+    password: string | null
+}
+
+export type newUser = {
+  email: string,
+  password: string | null
+  provider: string
 }
 
 export type Plan = {
@@ -18,7 +24,8 @@ export type Phase = {
   id: UUID,
   title: string,
   plan_id: UUID,
-  week_count: number
+  week_count: number,
+  status: "completed" | "in progress" | "not started"
 }
 
 export type FlatRow = {
@@ -55,6 +62,7 @@ export type NavMainItem = {
   url: string;
   icon: React.ElementType;
   isActive: boolean;
+  hasSub: boolean
 };
 
 export interface GeneratePlanInput {

@@ -43,10 +43,10 @@ const Error = ({error, reset}: {
                             <RefreshCw className="w-4 h-4" />
                             Try Again
                         </Button>
-                        <Link href="/" className="w-full">
+                        <Link href="/plans" className="w-full">
                             <Button variant="outline" className="w-full flex items-center gap-2">
                                 <Home className="w-4 h-4" />
-                                Go Home
+                                Go back to plans
                             </Button>
                         </Link>
                     </div>

@@ -1,4 +1,4 @@
-import Day from "@/components/Day"
+import Day from "@/components/days/Day"
 import { Suspense } from "react"
 import { DaySkeleton } from "@/components/skeleton"
 import { ArrowLeft, Home } from "lucide-react"

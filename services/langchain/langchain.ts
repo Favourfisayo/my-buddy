@@ -1,6 +1,6 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-
-export const model = new ChatGoogleGenerativeAI({
+import {wrapSDK} from "langsmith/wrappers"
+export const model = wrapSDK(new ChatGoogleGenerativeAI({
     model: "gemini-2.0-flash",
     temperature: 0
-})
+}))

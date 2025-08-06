@@ -1,28 +1,26 @@
-import { fetchPlanById, fetchPhasesWithWeekCount, fetchPlanProgressData } from "@/lib/data"
+import { fetchPlanById } from "@/lib/data"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
 import Link from "next/link"
-import { Calendar, Target, ArrowRight, BookOpen, Clock } from "lucide-react"
+import { Calendar, Target, ArrowRight, BookOpen, Clock, EqualApproximatelyIcon } from "lucide-react"
+import { getPlanAndPhaseData } from "@/utils/getPlanAndPhaseData"
+import clsx from "clsx"
+import { checkDataExists } from "@/utils/checkDataExists"
 
 const PlanPhases = async ({ plan_id }: {
   plan_id: string
 }) => {
-  const plan = await fetchPlanById(plan_id)
-  const phases = await fetchPhasesWithWeekCount(plan_id)
-  const progressData = await fetchPlanProgressData(plan_id)
-  const totalPhases = phases.length
-  const totalWeeks = progressData.total_weeks
-  const totalDays = totalWeeks * 7
-  const progress = totalDays > 0 ? (progressData.completed_days / totalDays) * 100 : 0
-  const progressRounded = Math.round(progress)
+  const [plan, planAndPhaseData] = await Promise.all([
+    fetchPlanById(plan_id),
+    getPlanAndPhaseData(plan_id)
+  ])
 
-  const weeksData = `${totalWeeks} ${totalWeeks === 1 ? "Week" : "Weeks"}`
-  const phasesData = `${totalPhases} ${totalPhases === 1 ? "Phase" : "Phases"}`
-  const totalMonths = Math.round(totalWeeks / 4)
-  const monthsData = `${totalMonths} ${totalMonths === 1 ? "Month" : "Months"}`
+  checkDataExists(plan)
+
+  const {phasesData, weeksData, monthsData, progressRounded, phases} = planAndPhaseData
 
   return (
     <div className="w-full max-w-6xl mx-auto p-6 space-y-8">
@@ -40,7 +38,7 @@ const PlanPhases = async ({ plan_id }: {
           </p>
         </div>
         
-        <div className="flex justify-center gap-8">
+        <div className="flex flex-wrap justify-center gap-8">
           <div className="flex items-center gap-2 text-muted-foreground">
             <BookOpen className="w-5 h-5" />
             <span className="font-medium">{phasesData}</span>
@@ -70,7 +68,7 @@ const PlanPhases = async ({ plan_id }: {
             </div>
             <Progress value={progressRounded} className="h-2" />
             <p className="text-sm text-muted-foreground">
-              Start your journey by selecting a phase below
+              {`${progressRounded > 0 ? `Continue` : `Start`} your journey by selecting a phase below`}
             </p>
           </div>
         </CardContent>
@@ -85,7 +83,7 @@ const PlanPhases = async ({ plan_id }: {
         </div>
         
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-          {phases?.map((phase, index) => (
+          {phases && phases.map((phase, index) => (
             <Card
               key={phase.id}
               className="group border-border/50 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
@@ -114,11 +112,21 @@ const PlanPhases = async ({ plan_id }: {
                     <span className="font-semibold">{phase.week_count} {phase.week_count === 1 ? "Week" : "Weeks"}</span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">Status</span>
-                    <Badge variant="secondary" className="text-xs">
-                      Not Started
-                    </Badge>
-                  </div>
+                     <span className="text-muted-foreground">Status</span>
+                     <Badge 
+                       variant="secondary" 
+                       className={clsx(
+                         "text-xs",
+                         phase.status === 'completed' && "bg-green-100 text-green-800 border-green-200",
+                         phase.status === 'in progress' && "bg-blue-100 text-blue-800 border-blue-200",
+                         phase.status  === 'not started' && "bg-gray-100 text-gray-800 border-gray-200"
+                       )}
+                     >
+                       { phase.status === 'completed' && "Completed"}
+                       {phase.status === 'in progress' && "In Progress"}
+                       {phase.status  === 'not started' && "Not Started"}
+                     </Badge>
+                   </div>
                 </div>
                 
                 <Link href={`/plans/${phase.plan_id}/phases/${phase.id}`} className="block">
@@ -133,7 +141,6 @@ const PlanPhases = async ({ plan_id }: {
         </div>
       </div>
 
-      {/* Completion Summary */}
       {phases && phases.length > 0 && (
         <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
           <CardHeader>
@@ -150,8 +157,11 @@ const PlanPhases = async ({ plan_id }: {
                 <div className="text-sm text-muted-foreground">Total Weeks</div>
               </div>
               <div className="text-center space-y-2">
-                <div className="text-2xl font-bold text-primary">{monthsData}</div>
-                <div className="text-sm text-muted-foreground">Months (approx)</div>
+                <div className="text-2xl flex items-center w-full justify-center font-bold text-primary">
+                <EqualApproximatelyIcon className="w-5 h-5"/>
+                  {monthsData}
+                  </div>
+                <div className="text-sm text-center  text-muted-foreground">Month(s) </div>
               </div>
               <div className="text-center space-y-2">
                 <div className="text-2xl font-bold text-primary">{`${progressRounded}%`}</div>

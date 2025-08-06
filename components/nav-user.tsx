@@ -1,11 +1,6 @@
 "use client"
 import {
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
 } from "lucide-react"
 import {
   Avatar,
@@ -15,10 +10,7 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -27,12 +19,14 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { UserInfo } from "./user-info"
 
 export function NavUser({
   user,
 }: {
   user: {
-    email: string | null | undefined
+    email: string | null | undefined,
+    image: string | undefined
   }
 }) {
   const { isMobile } = useSidebar()
@@ -46,6 +40,9 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
+              <UserInfo
+              user = {user}
+              />
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate text-xs">{user.email}</span>
               </div>
@@ -59,16 +56,15 @@ export function NavUser({
             sideOffset={4}
           >
             <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+            <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+              <UserInfo
+              user={user}
+              />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate text-xs">{user.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuItem>
-              <LogOut />
-              Log out
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

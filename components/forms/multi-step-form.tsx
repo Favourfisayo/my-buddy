@@ -1,13 +1,12 @@
 "use client"
 
-import { startTransition, useState, useTransition } from "react"
+import { useState, useTransition } from "react"
 import { z } from "zod"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
 import { generateAndSavePlan } from "@/lib/actions"
 import { Separator } from "@/components/ui/separator"
 import { $ZodIssue } from "zod/v4/core"
@@ -20,6 +19,8 @@ const promptSchemas = [
       "Topic can't be a number"
   }).refine(val => val.trim().length > 0, {
     message: "Please specify a topic to learn"
+  }).refine(val => isNaN(Number(val.trim())), {
+    message: "Topic can't be a number :)"
   }),
   
   z.union([z.string(), z.number()], {
@@ -43,7 +44,7 @@ const promptConfigs = [
     label: "How long do you want to learn this?",
     placeholder: "e.g. 3 months, 6 weeks, 1 year...",
     icon: Calendar,
-    description: "Set a realistic timeline that fits your schedule"
+    description: "Set a realistic timeline that fits your schedule (Please be specific)"
   },
   {
     label: "What is your goal for learning this?",
@@ -148,6 +149,7 @@ export default function MultiStepPrompts() {
                 <Button 
                   type="button"
                   variant="outline" 
+                  disabled = {isPending}
                   onClick={handleBack}
                   className="flex items-center gap-2"
                 >
@@ -160,6 +162,7 @@ export default function MultiStepPrompts() {
               
               <Button 
                 type="submit"
+                disabled={isPending}
                 className="flex items-center gap-2 px-8"
               >
                 {step < 2 ? (
@@ -173,6 +176,9 @@ export default function MultiStepPrompts() {
                     {isPending ? "Creating Plan" : "Create Plan"}
                   </>
                 )}
+              </Button>
+              <Button  style={{display: isPending ? "block" : "none"}} variant="destructive">
+                Cancel
               </Button>
             </div>
           </form>

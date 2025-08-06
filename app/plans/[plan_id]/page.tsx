@@ -1,9 +1,8 @@
-import PlanPhases from "@/components/plan-phases"
+import PlanPhases from "@/components/phase/plan-phases"
 import { Suspense } from "react"
 import { PlanPhasesSkeleton } from "@/components/skeleton"
 import { ArrowLeft, Home } from "lucide-react"
 import Link from "next/link"
-
 
 const page = async ({params}: {
   params: Promise<{plan_id: string}>
@@ -12,7 +11,6 @@ const page = async ({params}: {
   
   return (
     <div className="min-h-screen w-full bg-background">
-      {/* Navigation Header */}
       <div className="border-b border-border/50 bg-card/30 backdrop-blur-sm">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center gap-4">
@@ -35,7 +33,6 @@ const page = async ({params}: {
         </div>
       </div>
 
-      {/* Main Content */}
       <main className="py-8">
         <Suspense fallback={<PlanPhasesSkeleton />}>
           <PlanPhases plan_id={plan_id} />

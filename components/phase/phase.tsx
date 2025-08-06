@@ -11,12 +11,18 @@ import { fetchPhaseById, fetchWeeksAndDaysByPhaseId } from "@/lib/data"
 import { groupWeeksWithDays } from "@/utils/groupWeeksWithDays"
 import { Calendar, Clock, BookOpen, Target } from "lucide-react"
 import Link from "next/link"
+import { checkDataExists } from "@/utils/checkDataExists"
 
 const Phase = async ({phase_id}: {
     phase_id: string
 }) => {
-    const rawData = await fetchWeeksAndDaysByPhaseId(phase_id)
-    const phase = await fetchPhaseById(phase_id)
+    const [phase, rawData] = await Promise.all([
+       fetchPhaseById(phase_id),
+       fetchWeeksAndDaysByPhaseId(phase_id),
+      
+    ])
+    checkDataExists(phase)
+
     const structured = groupWeeksWithDays(rawData)
     
     const totalWeeks = structured?.length || 0
@@ -50,8 +56,8 @@ const Phase = async ({phase_id}: {
       <Separator className="my-8" />
 
       <div className="space-y-6">
-        {structured?.map((week, weekIndex) => (
-          <Card key={week.id} className="border-border/50 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300">
+        {structured?.map((week, _) => (
+          <Card key={week.week_number} className="border-border/50 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -75,10 +81,11 @@ const Phase = async ({phase_id}: {
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="space-y-4 pt-4">
-                      {week.days.map((day, dayIndex) => (
+                      {week.days.map((day, _) => (
                         <Link
                         key={day.id}
                         href={`/plans/${phase?.plan_id}/phases/${phase?.id}/days/${day.id}`}
+                        className="flex flex-col gap-1"
                         >
                         <div
                           className="flex items-start gap-4 p-4 rounded-lg bg-muted/30 border border-border/30 hover:bg-muted/50 transition-colors"

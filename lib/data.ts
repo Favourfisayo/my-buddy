@@ -1,5 +1,5 @@
 import sql from "@/lib/db";
-import { User, Plan, Phase, FlatRow, Resource } from "@/data/definitions";
+import { User,  Plan, Phase, FlatRow, Resource } from "@/data/definitions";
 import { useSession } from "@/hooks/useSession";
 
 export const fetchUser = async (email: string): Promise<User | undefined> => {
@@ -29,7 +29,7 @@ export const fetchUserPlans = async () => {
         const plansUpdated = plans.map((plan, _) => {
             return {
                 ...plan,
-                created_at: new Date(plan.created_at).toISOString()
+                created_at: new Date(plan.created_at).toLocaleDateString("en-US")
             }
         })
         return plansUpdated
@@ -40,24 +40,32 @@ export const fetchUserPlans = async () => {
     }
 
 }
-
-export const fetchPhasesWithWeekCount = async (plan_id: string) => {
+export const fetchPhasesWithStatus = async (plan_id: string) => {
     try {
         const result = await sql<Phase[]>`
-        SELECT
+        SELECT 
             phases.id,
             phases.title,
             phases.plan_id,
-            COUNT(weeks.id) AS week_count
-        FROM phases
-        LEFT JOIN weeks ON weeks.phase_id = phases.id
-        WHERE phases.plan_id = ${plan_id}
-        GROUP BY phases.id
-        `
+            COUNT(DISTINCT weeks.id) AS week_count,
+            
+            CASE
+                WHEN bool_and(days.status = 'completed') THEN 'completed'
+                WHEN bool_or(days.status IN ('in progress', 'completed')) THEN 'in progress'
+                ELSE 'not started'
+            END AS status
+
+            FROM phases
+            LEFT JOIN weeks ON weeks.phase_id = phases.id
+            LEFT JOIN days ON days.week_id = weeks.id
+            WHERE phases.plan_id = ${plan_id}
+            GROUP BY phases.id, phases.title, phases.plan_id, phases.sort_index
+            ORDER BY phases.sort_index ASC
+            `
         return result
     }catch(error) {
-        console.error(error)
-        throw new Error(`Error: ${error}`)
+        console.error(`Error: ${error}`)
+        throw new Error(`Error fetching phases status: ${error}`)
     }
 }
 

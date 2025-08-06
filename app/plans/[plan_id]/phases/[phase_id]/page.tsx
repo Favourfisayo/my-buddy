@@ -1,10 +1,8 @@
-import Phase from "@/components/phase"
+import Phase from "@/components/phase/phase"
 import { Suspense } from "react"
 import { PhaseSkeleton } from "@/components/skeleton"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
-
-
 const page = async ({params}: {
   params: Promise<{plan_id: string, phase_id: string}>
 }) => {

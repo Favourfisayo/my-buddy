@@ -6,17 +6,19 @@ import { Separator } from "@/components/ui/separator"
 import { BookOpen, Calendar,  ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import DayCard from "./DayCard"
-import {ResourceCard} from "./ResourceCards"
-import EmptyResourceCard from "./ResourceCards"
+import { ResourceCard } from "../resource/ResourceCards"
+import EmptyResourceCard from "../resource/ResourceCards"
 
 const Day = async ({day_id, phase_id}: {
     day_id: string,
     phase_id: string
 }) => {
-    const rawData = await fetchWeeksAndDaysByPhaseId(phase_id)
+    const [resources, rawData] = await Promise.all([
+         fetchResourcesByDayId(day_id),
+         fetchWeeksAndDaysByPhaseId(phase_id)
+    ])
     const structured = groupWeeksWithDays(rawData)
-    const resources = await fetchResourcesByDayId(day_id)
-    
+
     const daysRow = structured.map((data, _) => {
         return data.days
     })
@@ -77,7 +79,6 @@ const Day = async ({day_id, phase_id}: {
                 )}
             </div>
 
-            {/* Navigation */}
             <div className="flex justify-between items-center pt-8">
                 <Link href={`/plans/${phase_id}/phases/${phase_id}`}>
                     <Button variant="outline" className="flex items-center gap-2">
@@ -85,14 +86,14 @@ const Day = async ({day_id, phase_id}: {
                         Back to Phase
                     </Button>
                 </Link>
-                <div className="flex gap-2">
+                { /** <div className="flex gap-2">
                     <Button variant="outline" disabled>
                         Previous Day
                     </Button>
                     <Button variant="outline" disabled>
                         Next Day
                     </Button>
-                </div>
+                </div> **/}
             </div>
         </div>
     )

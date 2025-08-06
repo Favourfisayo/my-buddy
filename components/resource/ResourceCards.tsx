@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "./ui/button"
+import { Button } from "../ui/button"
 import Link from "next/link"
 import { ExternalLink, BookOpen } from "lucide-react"
 import { Resource } from "@/data/definitions"

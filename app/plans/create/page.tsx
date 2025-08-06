@@ -1,4 +1,4 @@
-import MultiStepForm from "@/components/multi-step-form"
+import MultiStepForm from "@/components/forms/multi-step-form"
 import { Badge } from "@/components/ui/badge"
 import { Sparkles, ArrowLeft } from "lucide-react"
 import Link from "next/link"

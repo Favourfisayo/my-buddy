@@ -1,5 +1,5 @@
 import { Skeleton } from "./ui/skeleton"
-import { CardContent, Card } from "./ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 
 export const PhaseSkeleton = () => (
     <div className="w-full max-w-4xl mx-auto p-6 space-y-8">
@@ -116,3 +116,43 @@ export const PhaseSkeleton = () => (
       </div>
     </div>
   )
+
+export const UserPlansSkeleton = () => {
+  return (
+    <div className="w-full">
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        {[1, 2, 3, 4].map((i) => (
+          <Card
+            key={i}
+            className="w-full border-border/50 bg-card/50 backdrop-blur-sm"
+          >
+            <CardHeader className="pb-2">
+              <div className="space-y-3">
+                <Skeleton className="h-6 w-3/4" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-full" />
+                </div>
+              </div>
+            </CardHeader>
+
+            <CardContent className="pt-0 space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <Skeleton className="h-3 w-16" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+                <Skeleton className="h-2 w-full" />
+              </div>
+            </CardContent>
+
+            <CardContent className="pt-2 space-y-3">
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-10 w-full" />
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  )
+}

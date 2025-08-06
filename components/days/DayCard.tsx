@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "./ui/badge"
+import { Badge } from "../ui/badge"
 import { Target, Clock, PlayCircle, CheckCircle } from "lucide-react"
 import { getStatusColor } from "@/utils/StatusUtilities"
-import StatusForm from "./status-form"
+import StatusForm from "../forms/status-form"
 const DayCard = ({status, id}: {
     status: string
     id: string
