@@ -1,64 +1,26 @@
 "use client"
 
-import { useState, useTransition } from "react"
-import { z } from "zod"
+import {useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { generateAndSavePlan } from "@/lib/actions"
+import {  savePlan } from "@/lib/actions"
 import { Separator } from "@/components/ui/separator"
 import { $ZodIssue } from "zod/v4/core"
-import { ArrowRight, ArrowLeft, Target, Calendar, BookOpen, CheckCircle } from "lucide-react"
-
-const promptSchemas = [
-  z.string({ 
-    error: (issue) => issue.input === undefined ?
-      "Please specify a topic to learn" :
-      "Topic can't be a number"
-  }).refine(val => val.trim().length > 0, {
-    message: "Please specify a topic to learn"
-  }).refine(val => isNaN(Number(val.trim())), {
-    message: "Topic can't be a number :)"
-  }),
-  
-  z.union([z.string(), z.number()], {
-    error: () => "This field is required"
-  }).refine(val => val !== "" && val !== null && val !== undefined, {
-    message: "Duration cannot be empty"
-  }),
-  
-  z.string()
-  .optional()
-]
-
-const promptConfigs = [
-  {
-    label: "What do you want to learn?",
-    placeholder: "e.g. React, Data Science, UI Design...",
-    icon: BookOpen,
-    description: "Choose a topic that excites you and aligns with your goals"
-  },
-  {
-    label: "How long do you want to learn this?",
-    placeholder: "e.g. 3 months, 6 weeks, 1 year...",
-    icon: Calendar,
-    description: "Set a realistic timeline that fits your schedule (Please be specific)"
-  },
-  {
-    label: "What is your goal for learning this?",
-    placeholder: "e.g. Get an internship, build a startup, freelance...",
-    icon: Target,
-    description: "Define what success looks like for you (optional)"
-  },
-]
+import { ArrowRight, ArrowLeft, CheckCircle } from "lucide-react"
+import { promptSchemas } from "@/prompts/schema/promptSchema"
+import { promptConfigs } from "@/prompts/promptConfigs"
+import PlanLoadingUI from "../plan-loading"
+import { isRedirectError } from "next/dist/client/components/redirect-error"
 
 export default function MultiStepPrompts() {
   const [step, setStep] = useState(0)
   const [prompts, setPrompts] = useState(["", "", ""])
   const [errors, setErrors] = useState<$ZodIssue[] | undefined>(undefined)
-  const [isPending, startTransition] = useTransition()
+  const [loading, setLoading] = useState(false)
+
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPrompts = [...prompts]
@@ -76,32 +38,55 @@ export default function MultiStepPrompts() {
     setStep(step - 1)
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    
+    setLoading(true)
     const schema = promptSchemas[step]
     const value = prompts[step]
     const result = schema.safeParse(value)
-    
+  
     if (!result.success) {
       setErrors(result.error.issues)
-      return
-  }
-    
-    if (step < 2) {
-      setStep(step + 1)
+      setLoading(false)
       return
     }
+  
+    if (step < 2) {
+      setStep(step + 1)
+      setLoading(false)
+      return
+    }
+  
     const input = {
       tech: prompts[0],
       duration: prompts[1],
       goal: prompts[2],
     }
 
-    startTransition(() => {
-      generateAndSavePlan(input)
-    })
+  
+    try {
+      const res = await fetch("/api/generate-plan", {
+        method: "POST",
+        body: JSON.stringify(input),
+        headers: { "Content-Type": "application/json" },
+      })
+  
+      if (!res.ok) throw new Error("Failed to generate plan")
+      const plan = await res.json()
+      await savePlan(plan)
+  
+    } catch (err: any) {
+      if (isRedirectError(err)) {
+        throw err
+      }
+      console.error("Error generating/saving plan", err)
+      throw new Error(`Error generating/saving plan: ${err}`)
+    } finally {
+      setLoading(false)
+    }
   }
+  
+  
 
   const { label, placeholder, icon: Icon, description } = promptConfigs[step]
 
@@ -125,6 +110,7 @@ export default function MultiStepPrompts() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
+            {!loading ? 
             <div className="space-y-2">
               <Label htmlFor="prompt-input" className="text-base font-medium">Your Answer</Label>
               <Input
@@ -141,6 +127,9 @@ export default function MultiStepPrompts() {
                 </p>
               ))}
             </div>
+            :
+            <PlanLoadingUI/>
+            }
             
             <Separator className="my-6" />
             
@@ -149,7 +138,7 @@ export default function MultiStepPrompts() {
                 <Button 
                   type="button"
                   variant="outline" 
-                  disabled = {isPending}
+                  disabled = {loading}
                   onClick={handleBack}
                   className="flex items-center gap-2"
                 >
@@ -159,10 +148,10 @@ export default function MultiStepPrompts() {
               ) : (
                 <div></div>
               )}
-              
+              <div className="flex gap-5">
               <Button 
                 type="submit"
-                disabled={isPending}
+                disabled={loading}
                 className="flex items-center gap-2 px-8"
               >
                 {step < 2 ? (
@@ -173,13 +162,11 @@ export default function MultiStepPrompts() {
                 ) : (
                   <>
                     <CheckCircle className="w-4 h-4" />
-                    {isPending ? "Creating Plan" : "Create Plan"}
+                    {loading ? "Creating Plan..." : "Create Plan"}
                   </>
                 )}
               </Button>
-              <Button  style={{display: isPending ? "block" : "none"}} variant="destructive">
-                Cancel
-              </Button>
+              </div>
             </div>
           </form>
         </CardContent>

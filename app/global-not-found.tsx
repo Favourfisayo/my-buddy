@@ -1,14 +1,17 @@
+import "./globals.css"
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Home, Search } from 'lucide-react'
-
-export const metadata = {
+import type { Metadata } from 'next'
+export const metadata: Metadata = {
   title: 'Not Found',
   description: 'The page you are looking for does not exist.',
 }
 
 export default function GlobalNotFound() {
   return (
+    <html lang="en">
+    <body>
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4 text-center">
       <div className="space-y-8 max-w-md">
         <div className="space-y-6">
@@ -26,18 +29,16 @@ export default function GlobalNotFound() {
         </div>
 
         <div className="space-y-4">
-          <Link href="/" className="block">
+          <Link href="/plans" className="block">
             <Button className="w-full max-w-xs" size="lg">
               <Home className="w-5 h-5 mr-2" />
               Go Back Home
             </Button>
           </Link>
-          
-          <p className="text-sm text-muted-foreground">
-            Or try navigating using the sidebar menu
-          </p>
         </div>
       </div>
     </div>
+    </body>
+    </html>
   )
 }

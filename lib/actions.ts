@@ -2,6 +2,7 @@
 import { signIn, signOut } from "@/auth"
 import { AuthError } from "next-auth"
 import z from "zod"
+import {v4 as uuidv4} from "uuid"
 import sql from "./db"
 import { newUser } from "@/data/definitions"
 import bcrypt from "bcrypt"
@@ -10,8 +11,9 @@ import { GeneratePlanInput, Plan } from "@/data/definitions"
 import { generateLLMOutput } from "@/features/llm/getLLMOutput"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
-import { PlanSchema } from "@/schema/Planschema"
+import { PlanSchema } from "@/features/plan/schema/Planschema"
 import { fetchUser } from "./data"
+import { savePlanToDb } from "@/features/plan/savePlanToDb"
 
 const statusSchema = z.object({
   status: z.enum(["completed", "in progress", "not started"])
@@ -53,8 +55,9 @@ export async function signUpWithCredentials(prevState: string | undefined, formD
   try {
     const existingUser = await fetchUser(email)
     if (existingUser) return "An account with this email already exists. Please try logging in instead."
-    
+    const id = uuidv4()
     const newUser = {
+      id,
       email,
       password,
       provider: "credentials"
@@ -109,103 +112,46 @@ export async function handleSignOut() {
     return { error: null, status: undefined}
   }
 
-export const generateAndSavePlan = async (input: GeneratePlanInput) => {
-  const rawPlanData = await generateLLMOutput(input)
-
-  const rawPlanDataParsed = PlanSchema.safeParse(rawPlanData)
-
-  if(!rawPlanDataParsed.success) {
-    console.error(z.treeifyError(rawPlanDataParsed.error))
-    throw new Error("Invalid plan data from LLM output.")
+  export const savePlan = async (planData: any) => {
+    const parsed = PlanSchema.safeParse(planData)
+    if (!parsed.success) {
+      console.error(z.treeifyError(parsed.error))
+      throw new Error("Invalid plan data")
+    }
+    const user = await useSession()
+    if (!user?.id) return
+    const userId = user.id
+    try {
+      await savePlanToDb(parsed.data, userId)
+    } catch (error) {
+      console.error(`transaction failed: ${error}`)
+      throw new Error("Error saving plan to database")
+    }
+  
+    revalidatePath("/plans")
+    redirect("/plans")
   }
 
-  const planData = rawPlanDataParsed.data 
-  const {plan_name, goal, duration_weeks} = planData
-
-  const user = await useSession()
-  if(!user || !user.id) return
-  const userId = user.id
-
+export const deletePlan = async(plan_id: string) => {
   try {
-    //Batch Inserting plan -> phases -> weeks -> days -> resources
-  await sql.begin(async (tx) => {
-    const [{id: planId}] = await tx`
-    INSERT INTO plans (created_by, name, goal, duration)
-    VALUES (${userId}, ${plan_name}, ${goal ?? null}, ${duration_weeks})
-    RETURNING id
-    `
-    const phaseValues = planData.phases.map((p, index) => [p.title, planId, index])
-    const phaseResult = await tx`
-    INSERT INTO phases (title, plan_id, sort_index)
-    VALUES ${sql(phaseValues)}
-    RETURNING id
-    `
-    const phaseIds = phaseResult.map(phase => phase.id)
+  await sql`
+  DELETE FROM plans WHERE id = ${plan_id}
+  `
+  }catch(error) {
+    console.error(`Error: ${error}`)
+    throw new Error(`Error deleting plan: ${error}`)
+  }
 
-    const weekValues: any[] = []
-    const weekIndexToPhase: any[] = [] // stores [phaseIndex, weekIndex] for later mapping
-    planData.phases.forEach((phase, phase_index) => {
-      phase.weeks.forEach((week, week_index) => {
-        weekValues.push([week.week_number, phaseIds[phase_index]])
-        weekIndexToPhase.push([phase_index, week_index])
-      })
-    })
-    
-    const weekResult = await tx`
-    INSERT INTO weeks (week_number, phase_id)
-    VALUES ${sql(weekValues)}
-    RETURNING id
-    `
-    
-    const weekIds = weekResult.map(week => week.id)
-
-    const dayValues: any[] = []
-    const dayIndexToWeek: any[] = []
-    weekIndexToPhase.forEach(([phaseIndex, weekIndex], globalWeekIndex) => {
-        const days = planData.phases[phaseIndex].weeks[weekIndex].days
-        days.forEach((day, dayIndex) => {
-          dayValues.push([day.day, day.topic, weekIds[globalWeekIndex]])
-          dayIndexToWeek.push([phaseIndex, weekIndex, dayIndex])
-        })
-    })
-
-    const dayResult = await tx`
-    INSERT INTO days (day_number, topic, week_id)
-    VALUES ${sql(dayValues)}
-    RETURNING id
-    `
-    const dayIds = dayResult.map(day => day.id)
-
-    const resourceValues: any[] = []
-    dayIndexToWeek.forEach(([phaseIndex, weekIndex, dayIndex], i) => {
-      const resources = planData.phases[phaseIndex].weeks[weekIndex].days[dayIndex].resources
-      for (const res of resources) {
-        resourceValues.push([dayIds[i], res.resource_type, res.resource_material])
-      }
-    })
-
-    if (resourceValues.length > 0) {
-      await tx`
-      INSERT INTO resources (day_id, type, url)
-      VALUES ${sql(resourceValues)}
-      `
-    }
-})
-}catch(error) {
-  console.error(`transaction failed: ${error}`)
-  throw new Error(`Error creating plan`)
-}
   revalidatePath("/plans")
-  redirect("/plans")
 }
 
 export const insertUser = async(user: newUser) => {
-  if(!user || !user.email) return
+  if(!user || !user.email || !user.id) return
   const hashedPassword = user.password ? await bcrypt.hash(user.password, 10) : null
   try {
       const result = await sql`
-      INSERT INTO users (email, password, provider)
-      VALUES (${user.email}, ${hashedPassword}, ${user.provider})
+      INSERT INTO users (id, email, password, provider)
+      VALUES (${user.id}, ${user.email}, ${hashedPassword}, ${user.provider})
       RETURNING id, email, provider
       `
       return result[0]

@@ -1,5 +1,5 @@
 import { model } from "@/services/langchain/langchain";
-import { PlanSchema } from "@/schema/Planschema";
+import { PlanSchema } from "@/features/plan/schema/Planschema";
 import { GeneratePlanInput } from "@/data/definitions";
 import { draftPrompt } from "@/utils/draftPrompt";
 import {traceable} from "langsmith/traceable"

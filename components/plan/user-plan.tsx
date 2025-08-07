@@ -6,6 +6,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card"
+import { AlertDialog } from "./alert-dialog"
 import { Progress } from "@/components/ui/progress"
 import { Calendar, Clock, ArrowRight, PlusCircle, Trash2 } from "lucide-react"
 import { Badge } from "../ui/badge"
@@ -13,7 +14,6 @@ import { fetchUserPlans } from "@/lib/data"
 import { Button } from "../ui/button"
 import Link from "next/link"
 import { getPlanAndPhaseData } from "@/utils/getPlanAndPhaseData"
-import { checkDataExists } from "@/utils/checkDataExists"
 
 const UserPlans = async () => {
 
@@ -52,7 +52,9 @@ const UserPlans = async () => {
                   <CardTitle className="text-lg font-bold group-hover:text-primary transition-colors line-clamp-2">
                     <div className="flex items-start justify-between gap-2">
                       <span className="flex-1 min-w-0">{plan.name}</span>
-                      <Trash2 className="w-4 h-4 cursor-pointer flex-shrink-0 mt-0.5" />
+                      <AlertDialog
+                      plan_id = {plan.id}
+                      />
                     </div>
                   </CardTitle>
                   <CardDescription className="text-sm text-muted-foreground space-y-2">

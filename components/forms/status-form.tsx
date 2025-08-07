@@ -21,6 +21,7 @@ const StatusForm = ({ status, id }: { status: string, id: string }) => {
     { status: "completed", icon: CheckCircle },
   ]
 
+  // makes sure the status on frontend is in sync with status in db.
   const handleStatusChange =  (val: string) => {
     if (inputRef.current) inputRef.current.value = val
     // Auto-submit the form after changing status

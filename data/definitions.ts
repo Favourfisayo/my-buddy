@@ -3,10 +3,11 @@ import { UUID } from "node:crypto"
 export type User = {
     id: UUID,
     email: string,
-    password: string | null
+    password: string | null 
 }
 
 export type newUser = {
+  id: string | undefined,
   email: string,
   password: string | null
   provider: string

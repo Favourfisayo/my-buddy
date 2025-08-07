@@ -40,7 +40,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   pages: {
     newUser: "/plans",
-    error: "auth/error",
     signIn: "/login"
   },
   callbacks: {
@@ -53,6 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       const existingUser = await  fetchUser(user.email);
       if (existingUser) return true;
       await insertUser({
+        id: user.id,
         email: user.email,
         password: null,
         provider: "google",
