@@ -67,10 +67,15 @@ export async function signUpWithCredentials(prevState: string | undefined, formD
       return "Failed to create account. Please try again."
     }
 
-    redirect("/plans")
   }catch(error) {
-
+    console.error(error)
+    throw new Error(`Error: ${error}`)
   }
+  await signIn("credentials", {
+    email, 
+    password,
+    redirectTo: "/plans"
+  })
 }
 export async function signInWithGoogle(callbackUrl: string) {
   try {
@@ -112,7 +117,7 @@ export async function handleSignOut() {
     return { error: null, status: undefined}
   }
 
-  export const savePlan = async (planData: any) => {
+  export async function savePlan (planData: any){
     const parsed = PlanSchema.safeParse(planData)
     if (!parsed.success) {
       console.error(z.treeifyError(parsed.error))
