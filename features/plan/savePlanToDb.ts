@@ -6,10 +6,11 @@ type ParsedDataPlan = z.infer<typeof PlanSchema>
 
 export const savePlanToDb = async (plan: ParsedDataPlan, userId: string) => {
     const { plan_name, goal, duration_weeks, phases } = plan
+    const duration_weeks_rounded = Math.round(duration_weeks)
     await sql.begin(async (tx) => {
         const [{ id: planId }] = await tx`
           INSERT INTO plans (created_by, name, goal, duration)
-          VALUES (${userId}, ${plan_name}, ${goal ?? null}, ${duration_weeks})
+          VALUES (${userId}, ${plan_name}, ${goal ?? null}, ${Math.round(duration_weeks_rounded)})
           RETURNING id
         `
   
@@ -26,7 +27,7 @@ export const savePlanToDb = async (plan: ParsedDataPlan, userId: string) => {
   
         phases.forEach((phase, phase_index) => {
           phase.weeks.forEach((week, week_index) => {
-            weekValues.push([week.week_number, phaseIds[phase_index]])
+            weekValues.push([Math.round(week.week_number), phaseIds[phase_index]])
             weekIndexToPhase.push([phase_index, week_index])
           })
         })
