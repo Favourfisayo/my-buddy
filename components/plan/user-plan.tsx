@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card"
 import { AlertDialog } from "./alert-dialog"
 import { Progress } from "@/components/ui/progress"
-import { Calendar, Clock, ArrowRight, PlusCircle, Trash2 } from "lucide-react"
+import { Calendar, Clock, ArrowRight, PlusCircle } from "lucide-react"
 import { Badge } from "../ui/badge"
 import { fetchUserPlans } from "@/lib/data"
 import { Button } from "../ui/button"

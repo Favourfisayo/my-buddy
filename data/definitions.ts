@@ -15,7 +15,7 @@ export type newUser = {
 
 export type Plan = {
   id: UUID,
-  created_at: Date,
+  created_at: string,
   name: string,
   goal: string,
   duration: number

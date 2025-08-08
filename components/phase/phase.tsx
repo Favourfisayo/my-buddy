@@ -56,7 +56,7 @@ const Phase = async ({phase_id}: {
       <Separator className="my-8" />
 
       <div className="space-y-6">
-        {structured?.map((week, _) => (
+        {structured?.map((week) => (
           <Card key={week.week_number} className="border-border/50 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
@@ -81,7 +81,7 @@ const Phase = async ({phase_id}: {
                   </AccordionTrigger>
                   <AccordionContent>
                     <div className="space-y-4 pt-4">
-                      {week.days.map((day, _) => (
+                      {week.days.map((day) => (
                         <Link
                         key={day.id}
                         href={`/plans/${phase?.plan_id}/phases/${phase?.id}/days/${day.id}`}

@@ -13,9 +13,7 @@ import { Label } from "@/components/ui/label"
 import { authenticate, signUpWithCredentials } from "@/lib/actions"
 import { useActionState } from "react"
 import { useSearchParams } from "next/navigation"
-import { siGoogle } from "simple-icons"
 import { useState } from "react"
-import { signInWithGoogle } from "@/lib/actions"
 
 type Mode = "login" | "signup"
 
@@ -29,13 +27,6 @@ export function LoginForm() {
 
   const [mode, setMode] = useState<Mode>("login")
 
-  const handleGoogleSignIn = async () => {
-    try {
-      await signInWithGoogle(callbackUrl) 
-    } catch (error) {
-      console.error("Failed to sign in:", error)
-    }
-  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -75,28 +66,6 @@ export function LoginForm() {
                 <div className="flex flex-col gap-3">
                   <Button disabled={isLoginPending} type="submit" className="w-full">
                     {isLoginPending ? "Logging in..." : "Login"}
-                  </Button>
-                  
-                  <Button 
-                    disabled={isLoginPending} 
-                    onClick={handleGoogleSignIn} 
-                    variant="outline" 
-                    type="button"
-                    className="w-full"
-                  >
-                    <svg
-                      role="img"
-                      viewBox="0 0 24 24"
-                      width="16"
-                      height="16"
-                      fill={`#${siGoogle.hex}`}
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="mr-2"
-                    >
-                      <title>{siGoogle.title}</title>
-                      <path d={siGoogle.path} />
-                    </svg>
-                    Login with Google
                   </Button>
                 </div>
                 
@@ -147,28 +116,6 @@ export function LoginForm() {
                   <Button disabled={isSignupPending} type="submit" className="w-full">
                     {isSignupPending ? "Creating account..." : "Create Account"}
                   </Button>
-                  
-                  <Button 
-                    disabled={isSignupPending} 
-                    onClick={handleGoogleSignIn} 
-                    variant="outline" 
-                    type="button"
-                    className="w-full"
-                  >
-                    <svg
-                      role="img"
-                      viewBox="0 0 24 24"
-                      width="16"
-                      height="16"
-                      fill={`#${siGoogle.hex}`}
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="mr-2"
-                    >
-                      <title>{siGoogle.title}</title>
-                      <path d={siGoogle.path} />
-                    </svg>
-                    Sign up with Google
-                  </Button>
                 </div>
                 
                 {signupErrorMessage && (
@@ -203,6 +150,9 @@ export function LoginForm() {
                 </button>
               </>
             )}
+          </div>
+          <div className="mt-5">
+            <p className="text-center text-xs font-semibold ">Sorry i would implement google sign-ins soon for faster authentication</p>
           </div>
         </CardContent>
       </Card>

@@ -23,7 +23,7 @@ export default function GlobalNotFound() {
             <h1 className="text-6xl font-bold tracking-tight">404</h1>
             <h2 className="text-2xl font-semibold">Page Not Found</h2>
             <p className="text-lg text-muted-foreground max-w-sm mx-auto">
-              Sorry, the page you're looking for doesn't exist or has been moved.
+              Sorry, the page you&apos;re looking for doesn&apos;t exist or has been moved.
             </p>
           </div>
         </div>

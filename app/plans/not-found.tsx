@@ -14,7 +14,7 @@ export default async function NotFound() {
             <h1 className="text-6xl font-bold tracking-tight">404</h1>
             <h2 className="text-2xl font-semibold">Plan Not Found</h2>
             <p className="text-lg text-muted-foreground max-w-sm mx-auto">
-              The learning plan you're looking for doesn't exist or has been removed.
+              The learning plan you&apos;re looking for doesn&apos;t exist or has been removed.
             </p>
             <Link href='/plans'>
             <Button>

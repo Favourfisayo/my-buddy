@@ -75,7 +75,7 @@ export default function MultiStepPrompts() {
       const plan = await res.json()
       await savePlan(plan)
   
-    } catch (err: any) {
+    } catch (err) {
       if (isRedirectError(err)) {
         throw err
       }

@@ -156,3 +156,11 @@ export const UserPlansSkeleton = () => {
     </div>
   )
 }
+
+export const PlansSidebarSkeleton = () => (
+  <div className="space-y-2 px-3">
+    <div className="h-4 bg-muted/50 rounded animate-pulse"></div>
+    <div className="h-4 bg-muted/50 rounded animate-pulse w-3/4"></div>
+    <div className="h-4 bg-muted/50 rounded animate-pulse w-1/2"></div>
+  </div>
+)

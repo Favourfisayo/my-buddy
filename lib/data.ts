@@ -1,6 +1,6 @@
 import sql from "@/lib/db";
 import { User,  Plan, Phase, FlatRow, Resource } from "@/data/definitions";
-import { useSession } from "@/hooks/useSession";
+import { getSession } from "@/utils/getSession";
 
 export const fetchUser = async (email: string): Promise<User | undefined> => {
     try {
@@ -17,7 +17,7 @@ export const fetchUser = async (email: string): Promise<User | undefined> => {
 
 export const fetchUserPlans = async () => {
     try{
-        const session = await useSession()
+        const session = await getSession()
         const userId = session?.id
         if(!userId) return
         const plans = await sql<Plan[]> `
@@ -26,7 +26,7 @@ export const fetchUserPlans = async () => {
         JOIN users ON users.id = plans.created_by
         WHERE users.id = ${userId}
         `
-        const plansUpdated = plans.map((plan, _) => {
+        const plansUpdated = plans.map((plan) => {
             return {
                 ...plan,
                 created_at: new Date(plan.created_at).toLocaleDateString("en-US")

@@ -6,7 +6,6 @@ import Link from "next/link"
 const page = () => {
   return (
     <div className="min-h-screen w-full bg-background">
-      {/* Navigation Header */}
       <div className="border-b border-border/50 bg-card/30 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <Link 
@@ -31,7 +30,7 @@ const page = () => {
                 Create a Plan
               </h1>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Let's build a personalized learning path that fits your goals and schedule
+                Let&apos;s build a personalized learning path that fits your goals and schedule
               </p>
             </div>
           </div>

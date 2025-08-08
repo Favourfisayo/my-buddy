@@ -1,6 +1,6 @@
 import { auth } from "@/auth"
 
-export const useSession = async () => {
+export const getSession = async () => {
     try {
     const session = await auth()
     if (session) return session?.user

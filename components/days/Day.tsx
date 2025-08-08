@@ -19,14 +19,14 @@ const Day = async ({day_id, phase_id}: {
     ])
     const structured = groupWeeksWithDays(rawData)
 
-    const daysRow = structured.map((data, _) => {
+    const daysRow = structured.map((data) => {
         return data.days
     })
-    const days = daysRow[0]?.map((day, _) => {
+    const days = daysRow[0]?.map((day) => {
         return day
     })
 
-    const day = days?.filter((day, _) => day.id === day_id)[0]
+    const day = days?.filter((day) => day.id === day_id)[0]
     return (
         <div className="w-full max-w-4xl mx-auto p-6 space-y-8">
             <div className="text-center space-y-6">
@@ -51,13 +51,12 @@ const Day = async ({day_id, phase_id}: {
             {/* Learning Resources and Content */}
             <div className="space-y-8">
                 <div className="text-center">
-                    <h2 className="text-2xl md:text-3xl font-bold mb-2">Today's Learning</h2>
+                    <h2 className="text-2xl md:text-3xl font-bold mb-2">Today&apos;s Learning</h2>
                     <p className="text-muted-foreground">
-                        Explore the resources and materials for today's topic
+                        Explore the resources and materials for today&apos;s topic
                     </p>
                 </div>
 
-                {/* Resources Section */}
                 {resources && resources.length > 0 ? (
                     <div className="space-y-6">
                         <h3 className="text-xl font-semibold flex items-center gap-2">

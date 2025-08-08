@@ -22,7 +22,7 @@ const DayCard = ({status, id}: {
         <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
                 <Target className="w-5 h-5" />
-                Today's Progress
+                Today&apos;s Progress
             </CardTitle>
         </CardHeader>
         <CardContent>

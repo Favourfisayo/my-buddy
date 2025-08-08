@@ -6,12 +6,10 @@ import {v4 as uuidv4} from "uuid"
 import sql from "./db"
 import { newUser } from "@/data/definitions"
 import bcrypt from "bcrypt"
-import { useSession } from "@/hooks/useSession"
-import { GeneratePlanInput, Plan } from "@/data/definitions"
-import { generateLLMOutput } from "@/features/llm/getLLMOutput"
+import { getSession } from "@/utils/getSession"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
-import { PlanSchema } from "@/features/plan/schema/Planschema"
+import { PlanOutput, PlanSchema } from "@/features/plan/schema/Planschema"
 import { fetchUser } from "./data"
 import { savePlanToDb } from "@/features/plan/savePlanToDb"
 
@@ -50,7 +48,7 @@ export async function signUpWithCredentials(prevState: string | undefined, formD
     return "Invalid input. Please check your details and try again."
   }
 
-  const {email, password, confirmPassword, redirectTo} = parsedCredentials.data
+  const {email, password, confirmPassword} = parsedCredentials.data
   if (password !== confirmPassword) return "Passwords do not match. Please try again."
   try {
     const existingUser = await fetchUser(email)
@@ -76,17 +74,6 @@ export async function signUpWithCredentials(prevState: string | undefined, formD
     password,
     redirectTo: "/plans"
   })
-}
-export async function signInWithGoogle(callbackUrl: string) {
-  try {
-    await signIn("google", {redirectTo: callbackUrl || "/plans"})
-  } catch (error) {
-    if (error instanceof AuthError) {
-      console.error("Authentication error:", error)
-      throw error
-    }
-    throw error
-  }
 }
 export async function handleSignOut() {
   await signOut({ redirectTo: "/" })
@@ -117,13 +104,13 @@ export async function handleSignOut() {
     return { error: null, status: undefined}
   }
 
-  export async function savePlan (planData: any){
+  export async function savePlan (planData: PlanOutput){
     const parsed = PlanSchema.safeParse(planData)
     if (!parsed.success) {
       console.error(z.treeifyError(parsed.error))
       throw new Error("Invalid plan data")
     }
-    const user = await useSession()
+    const user = await getSession()
     if (!user?.id) return
     const userId = user.id
     try {
