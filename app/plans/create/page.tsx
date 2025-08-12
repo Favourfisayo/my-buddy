@@ -1,23 +1,14 @@
 import MultiStepForm from "@/components/forms/multi-step-form"
 import { Badge } from "@/components/ui/badge"
-import { Sparkles, ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { Sparkles } from "lucide-react"
+import { Metadata } from "next"
 
+export const metadata: Metadata = {
+  title: "Create Plan"
+}
 const page = () => {
   return (
     <div className="min-h-screen w-full bg-background">
-      <div className="border-b border-border/50 bg-card/30 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto px-6 py-4">
-          <Link 
-            href="/plans"
-            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Plans
-          </Link>
-        </div>
-      </div>
-
       <main className="py-12 px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">

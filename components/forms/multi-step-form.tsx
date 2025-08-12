@@ -91,7 +91,7 @@ export default function MultiStepPrompts() {
   const { label, placeholder, icon: Icon, description } = promptConfigs[step]
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full  mx-auto">
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-2 mb-4">
           <Badge variant="secondary" className="px-4 py-2 text-sm font-medium">

@@ -64,7 +64,7 @@ const PlanPhases = async ({ plan_id }: {
           <div className="space-y-4">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Overall Progress</span>
-              <span className="font-medium">{`${progressRounded}%`} Complete</span>
+              <span className="font-medium">{`${progressRounded}%`} Completed</span>
             </div>
             <Progress value={progressRounded} className="h-2" />
             <p className="text-sm text-muted-foreground">

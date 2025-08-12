@@ -1,30 +1,17 @@
 import sql from "@/lib/db";
-import { User,  Plan, Phase, FlatRow, Resource } from "@/data/definitions";
-import { getSession } from "@/utils/getSession";
-
-export const fetchUser = async (email: string): Promise<User | undefined> => {
-    try {
-        const user = await sql<User[]>`
-        SELECT * FROM users WHERE 
-        email=${email}
-        `
-        return user[0]
-    }catch(error) {
-        console.error(error)
-        throw new Error(`Error: ${error}`)
-    }
-}
+import { Plan, Phase, FlatRow, Resource } from "@/data/definitions";
+import { auth } from "@/auth";
 
 export const fetchUserPlans = async () => {
     try{
-        const session = await getSession()
-        const userId = session?.id
-        if(!userId) return
+        const session = await auth()
+        const userEmail = session?.user?.email
+        if(!userEmail) return
         const plans = await sql<Plan[]> `
         SELECT plans.* 
         FROM plans
-        JOIN users ON users.id = plans.created_by
-        WHERE users.id = ${userId}
+        JOIN users ON users.email = plans.created_by
+        WHERE users.email = ${userEmail}
         `
         const plansUpdated = plans.map((plan) => {
             return {
@@ -70,31 +57,27 @@ export const fetchPhasesWithStatus = async (plan_id: string) => {
 }
 
 export const fetchPlanProgressData = async (plan_id: string) => {
-    try {
-        const result = await sql<{
-            completed_days: number,
-            total_weeks: number 
-        }[]>`
-        SELECT
-        (
-            SELECT COUNT (DISTINCT weeks.id)
-            FROM phases
-            INNER JOIN weeks ON weeks.phase_id = phases.id
-            WHERE phases.plan_id = ${plan_id}
-        ) AS total_weeks,
-
+  try {
+    const result = await sql<{
+      completed_days: number;
+      total_days: number;
+    }[]>`
+      SELECT
+        COUNT(DISTINCT days.id) AS total_days,
         COUNT(CASE WHEN days.status = 'completed' THEN 1 END) AS completed_days
-        FROM phases
-        INNER JOIN weeks ON weeks.phase_id = phases.id
-        INNER JOIN days ON days.week_id = weeks.id
-        WHERE phases.plan_id = ${plan_id}
-        `
-        return result[0]
-    }catch(error) {
-        console.error(error)
-        throw(new Error(`${error}`))
-    }
-}
+      FROM phases
+      INNER JOIN weeks ON weeks.phase_id = phases.id
+      INNER JOIN days ON days.week_id = weeks.id
+      WHERE phases.plan_id = ${plan_id}
+    `;
+
+    return result[0];
+  } catch (error) {
+    console.error(error);
+    throw new Error(`${error}`);
+  }
+};
+
 
 export const fetchPlanById = async (plan_id: string) => {
     try {

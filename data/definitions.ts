@@ -1,20 +1,6 @@
-import { UUID } from "node:crypto"
-
-export type User = {
-    id: UUID,
-    email: string,
-    password: string | null 
-}
-
-export type newUser = {
-  id: string | undefined,
-  email: string,
-  password: string | null
-  provider: string
-}
 
 export type Plan = {
-  id: UUID,
+  id: string,
   created_at: string,
   name: string,
   goal: string,
@@ -22,9 +8,9 @@ export type Plan = {
 }
 
 export type Phase = {
-  id: UUID,
+  id: string,
   title: string,
-  plan_id: UUID,
+  plan_id: string,
   week_count: number,
   status: "completed" | "in progress" | "not started"
 }
@@ -55,7 +41,7 @@ export type Resource = {
   id: number,
   type: string,
   url: string,
-  day_id: UUID
+  day_id: string
 }
 
 export type NavMainItem = {

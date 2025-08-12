@@ -2,7 +2,7 @@ import { Book, Target, Code2, LogOutIcon } from "lucide-react"
 import { NavUser } from "../nav-user"
 import { NavMainItem } from "@/data/definitions"
 import { handleSignOut } from "@/lib/actions"
-import { getSession } from "@/utils/getSession"
+import { Suspense } from "react"
 import {
   Sidebar,
   SidebarContent,
@@ -33,9 +33,7 @@ const navMain: NavMainItem[] = [
 ]
 
 export async function AppSidebar() {
-  const session = await getSession()
   const plans = await fetchUserPlans()
-
   return (
     <Sidebar defaultValue="true" className="border-r border-border/50 ">
       <SidebarHeader className="border-b border-border/50 bg-card/30 backdrop-blur-sm">
@@ -54,7 +52,9 @@ export async function AppSidebar() {
         <NavMain navMain={navMain} plans={plans}/>
       </SidebarContent>
         <SidebarFooter className="border-t border-border/50 bg-card/30 backdrop-blur-sm">
-          <NavUser user={{ email: session?.email ?? null, image: session?.image ?? undefined}} />
+        <Suspense>
+          <NavUser />
+        </Suspense>
           <form action={handleSignOut}>
           <SidebarMenuButton asChild type="submit">
             <button type="submit">

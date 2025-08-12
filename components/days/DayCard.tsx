@@ -27,8 +27,8 @@ const DayCard = ({status, id}: {
         </CardHeader>
         <CardContent>
             <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                <div className="flex lg:flex-row flex-col gap-3 items-center justify-between">
+                    <div className="flex w-full justify-between items-center gap-3">
                         <span className="text-sm font-medium">Learning Status</span>
                         <Badge className={`px-3 py-1 text-xs font-medium border ${getStatusColor(status)}`}>
                             <div className="flex items-center gap-1">

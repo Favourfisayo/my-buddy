@@ -13,7 +13,10 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "My Buddy",
+  title: {
+    template: '%s | My Buddy',
+    default: "My Buddy"
+  },
   description: "Create your personalised learning plan and track progress!",
 };
 

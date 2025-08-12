@@ -1,161 +1,46 @@
 "use client"
+import { BookOpen, Github } from "lucide-react"
 
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { authenticate, signUpWithCredentials } from "@/lib/actions"
-import { useActionState } from "react"
-import { useSearchParams } from "next/navigation"
-import { useState } from "react"
-
-type Mode = "login" | "signup"
-
-export function LoginForm() {
-  const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get("callbackUrl") || "/plans"
-
-  
-  const [loginErrorMessage, loginAction, isLoginPending] = useActionState(authenticate, undefined)
-  const [signupErrorMessage, signupAction, isSignupPending] = useActionState(signUpWithCredentials, undefined)
-
-  const [mode, setMode] = useState<Mode>("login")
-
-
+import { signIn } from "next-auth/react"
+export function LoginForm({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   return (
-    <div className="flex flex-col gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            {mode === "login" ? "Login to your account" : "Create an account"}
-          </CardTitle>
-          <CardDescription>
-            {mode === "login"
-              ? "Enter your email below to login to your account"
-              : "Fill in your details to create a new account"}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {mode === "login" ? (
-            // LOGIN FORM
-            <form action={loginAction}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-3">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    name="email"
-                    placeholder="m@example.com"
-                    required
-                  />
-                </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="password">Password</Label>
-                  <Input id="password" type="password" name="password" required />
-                </div>
-                <input type="hidden" name="redirectTo" value={callbackUrl} />
-                <input type="hidden" name="mode" value="login" />
-                
-                <div className="flex flex-col gap-3">
-                  <Button disabled={isLoginPending} type="submit" className="w-full">
-                    {isLoginPending ? "Logging in..." : "Login"}
-                  </Button>
-                </div>
-                
-                {loginErrorMessage && (
-                  <p className="text-sm text-red-500">{loginErrorMessage}</p>
-                )}
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
+      <form>
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col items-center gap-2">
+            <a
+              href="#"
+              className="flex flex-col items-center gap-2 font-medium"
+            >
+              <div className="flex size-8 items-center justify-center rounded-md">
+                <BookOpen className="size-6" />
               </div>
-            </form>
-          ) : (
-            // SIGNUP FORM
-            <form action={signupAction}>
-              <div className="flex flex-col gap-6">
-                <div className="grid gap-3">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    name="email"
-                    placeholder="m@example.com"
-                    required
-                  />
-                </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <Input 
-                    id="signup-password" 
-                    type="password" 
-                    name="password" 
-                    placeholder="Minimum 6 characters"
-                    minLength={6}
-                    required 
-                  />
-                </div>
-                <div className="grid gap-3">
-                  <Label htmlFor="confirm-password">Confirm Password</Label>
-                  <Input 
-                    id="confirm-password" 
-                    type="password" 
-                    name="confirmPassword" 
-                    placeholder="Confirm your password"
-                    minLength={6}
-                    required 
-                  />
-                </div>
-                <input type="hidden" name="redirectTo" value={callbackUrl} />
-                
-                <div className="flex flex-col gap-3">
-                  <Button disabled={isSignupPending} type="submit" className="w-full">
-                    {isSignupPending ? "Creating account..." : "Create Account"}
-                  </Button>
-                </div>
-                
-                {signupErrorMessage && (
-                  <p className="text-sm text-red-500">{signupErrorMessage}</p>
-                )}
-              </div>
-            </form>
-          )}
-          
-          {/* Mode Toggle */}
-          <div className="mt-4 text-center text-sm">
-            {mode === "login" ? (
-              <>
-                Don&apos;t have an account?{" "}
-                <button
-                  type="button"
-                  onClick={() => setMode("signup")}
-                  className="underline underline-offset-4 text-primary hover:text-primary/80"
-                >
-                  Sign up
-                </button>
-              </>
-            ) : (
-              <>
-                Already have an account?{" "}
-                <button
-                  type="button"
-                  onClick={() => setMode("login")}
-                  className="underline underline-offset-4 text-primary hover:text-primary/80"
-                >
-                  Login
-                </button>
-              </>
-            )}
+              <span className="sr-only">My Buddy</span>
+            </a>
+            <h1 className="text-xl font-bold">Welcome to MyBuddy</h1>
           </div>
-          <div className="mt-5">
-            <p className="text-center text-xs font-semibold ">Sorry i would implement google sign-ins soon for faster authentication</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Button onClick={() => signIn("github", {redirectTo: "/plans"})} variant="outline" type="button" className="w-full">
+              <Github/>
+              Continue with Github
+            </Button>
+            <Button onClick={() => signIn("google", {redirectTo: "/plans"})} variant="outline" type="button" className="w-full">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path
+                  d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
+                  fill="currentColor"
+                />
+              </svg>
+              Continue with Google
+            </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </form>
     </div>
   )
 }

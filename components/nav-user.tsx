@@ -15,17 +15,10 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { UserInfo } from "./user-info"
-
-export function NavUser({
-  user,
-}: {
-  user: {
-    email: string | null | undefined,
-    image: string | undefined
-  }
-}) {
+import { useSession } from "next-auth/react"
+export function NavUser() {
   const { isMobile } = useSidebar()
-
+  const {data: session} = useSession()
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -35,11 +28,13 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <UserInfo
-              user = {user}
+              
+            {session && <UserInfo
+              session={session}
               />
+            }
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate text-xs">{session?.user?.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -52,11 +47,12 @@ export function NavUser({
           >
             <DropdownMenuLabel className="p-0 font-normal">
             <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-              <UserInfo
-              user={user}
+            {session && <UserInfo
+              session={session}
               />
+            }
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate text-xs">{session?.user?.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>

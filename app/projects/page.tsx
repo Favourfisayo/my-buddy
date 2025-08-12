@@ -8,7 +8,11 @@ import {
   ArrowLeft,
 } from "lucide-react"
 import Link from "next/link"
+import { Metadata } from "next"
 
+export const metadata: Metadata = {
+  title: "Projects | My Buddy"
+}
 const ProjectsPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
