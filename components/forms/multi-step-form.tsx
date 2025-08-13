@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import {  savePlan } from "@/lib/actions"
 import { Separator } from "@/components/ui/separator"
 import { $ZodIssue } from "zod/v4/core"
 import { ArrowRight, ArrowLeft, CheckCircle } from "lucide-react"
@@ -63,18 +62,14 @@ export default function MultiStepPrompts() {
       goal: prompts[2],
     }
 
-  
     try {
-      const res = await fetch("/api/generate-plan", {
+      const res = await fetch("/api/save-plan", {
         method: "POST",
         body: JSON.stringify(input),
         headers: { "Content-Type": "application/json" },
       })
   
       if (!res.ok) throw new Error("Failed to generate plan")
-      const plan = await res.json()
-      await savePlan(plan)
-  
     } catch (err) {
       if (isRedirectError(err)) {
         throw err

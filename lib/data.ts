@@ -1,32 +1,20 @@
 import sql from "@/lib/db";
 import { Plan, Phase, FlatRow, Resource } from "@/data/definitions";
-import { auth } from "@/auth";
-
 export const fetchUserPlans = async () => {
-    try{
-        const session = await auth()
-        const userEmail = session?.user?.email
-        if(!userEmail) return
-        const plans = await sql<Plan[]> `
-        SELECT plans.* 
-        FROM plans
-        JOIN users ON users.email = plans.created_by
-        WHERE users.email = ${userEmail}
-        `
-        const plansUpdated = plans.map((plan) => {
-            return {
-                ...plan,
-                created_at: new Date(plan.created_at).toLocaleDateString("en-US")
-            }
-        })
-        return plansUpdated
+    try {
+        const res = await fetch("/api/get-user-plans");
 
-    }catch(error) {
-        console.error(error)
-        throw new Error(`Error: ${error}`)
+        if (!res.ok) {
+            throw new Error(`Failed to fetch: ${res.status}`);
+        }
+
+        return await res.json();
+    } catch (error) {
+        console.error("Error fetching user plans:", error);
+        throw error;
     }
+};
 
-}
 export const fetchPhasesWithStatus = async (plan_id: string) => {
     try {
         const result = await sql<Phase[]>`

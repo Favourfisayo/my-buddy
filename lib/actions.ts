@@ -1,5 +1,5 @@
 "use server"
-import { signIn, signOut } from "@/auth"
+import { signOut } from "@/auth"
 import z from "zod"
 import sql from "./db"
 import { auth } from "@/auth"

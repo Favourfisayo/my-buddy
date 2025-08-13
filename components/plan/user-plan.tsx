@@ -14,12 +14,13 @@ import { fetchUserPlans } from "@/lib/data"
 import { Button } from "../ui/button"
 import Link from "next/link"
 import { getPlanAndPhaseData } from "@/utils/getPlanAndPhaseData"
+import { Plan } from "@/data/definitions"
 
 const UserPlans = async () => {
 
   const plans = await fetchUserPlans()
   const plansWithProgress = await Promise.all(
-    (plans || []).map(async (plan) => {
+    (plans || []).map(async (plan: Plan) => {
       try {
         const progressData = await getPlanAndPhaseData(plan.id)
         return {
