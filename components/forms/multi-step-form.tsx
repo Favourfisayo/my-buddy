@@ -1,5 +1,4 @@
 "use client"
-
 import {useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -12,13 +11,14 @@ import { ArrowRight, ArrowLeft, CheckCircle } from "lucide-react"
 import { promptSchemas } from "@/prompts/schema/promptSchema"
 import { promptConfigs } from "@/prompts/promptConfigs"
 import PlanLoadingUI from "../plan-loading"
-import { isRedirectError } from "next/dist/client/components/redirect-error"
+import { useRouter } from "next/navigation"
 
 export default function MultiStepPrompts() {
   const [step, setStep] = useState(0)
   const [prompts, setPrompts] = useState(["", "", ""])
   const [errors, setErrors] = useState<$ZodIssue[] | undefined>(undefined)
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
 
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,14 +66,13 @@ export default function MultiStepPrompts() {
       const res = await fetch("/api/save-plan", {
         method: "POST",
         body: JSON.stringify(input),
-        headers: { "Content-Type": "application/json" },
       })
   
       if (!res.ok) throw new Error("Failed to generate plan")
+        
+      router.push("/plans")
+
     } catch (err) {
-      if (isRedirectError(err)) {
-        throw err
-      }
       console.error("Error generating/saving plan", err)
       throw new Error(`Error generating/saving plan: ${err}`)
     } finally {
@@ -123,7 +122,10 @@ export default function MultiStepPrompts() {
               ))}
             </div>
             :
+            <>
             <PlanLoadingUI/>
+            <p>Creating your plan...</p>
+            </>
             }
             
             <Separator className="my-6" />

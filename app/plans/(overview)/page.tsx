@@ -1,11 +1,12 @@
 import UserPlans from "@/components/plan/user-plan"
 import { UserPlansSkeleton } from "@/components/skeleton"
 import { Suspense } from "react"
-import { Metadata } from "next"
+import { Metadata } from "next" 
 
 export const metadata: Metadata = {
-  title: "Plans"
+  title: "My Plans"
 }
+export const dynamic = "force-dynamic"
 const page = () => {
   return (
     <section className="w-full px-0 ">

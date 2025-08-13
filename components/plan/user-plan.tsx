@@ -17,7 +17,6 @@ import { getPlanAndPhaseData } from "@/utils/getPlanAndPhaseData"
 import { Plan } from "@/data/definitions"
 
 const UserPlans = async () => {
-
   const plans = await fetchUserPlans()
   const plansWithProgress = await Promise.all(
     (plans || []).map(async (plan: Plan) => {
@@ -26,14 +25,12 @@ const UserPlans = async () => {
         return {
           ...plan,
           progress: progressData.progressRounded,
-          weeksData: progressData.weeksData
         }
       } catch (error) {
         console.error(`Error fetching progress for plan ${plan.id}:`, error)
         return {
           ...plan,
           progress: 0,
-          weeksData: "0 Weeks"
         }
       }
     })
@@ -89,7 +86,7 @@ const UserPlans = async () => {
 
               <CardFooter className="pt-0 flex flex-col gap-3 items-stretch">
                 <p className="text-xs text-muted-foreground text-center">
-                  Created: {new Date(plan.created_at).toLocaleDateString()}
+                  Created: {plan.created_at}
                 </p>
                 <Link href={`/plans/${plan.id}`} className="w-full">
                   <Button className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-colors">

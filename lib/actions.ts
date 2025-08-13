@@ -4,7 +4,6 @@ import z from "zod"
 import sql from "./db"
 import { auth } from "@/auth"
 import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
 import { PlanOutput, PlanSchema } from "@/features/plan/schema/Planschema"
 import { savePlanToDb } from "@/features/plan/savePlanToDb"
 
@@ -57,7 +56,6 @@ export async function handleSignOut() {
     }
   
     revalidatePath("/plans")
-    redirect("/plans")
   }
 
 export const deletePlan = async(plan_id: string) => {

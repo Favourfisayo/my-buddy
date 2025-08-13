@@ -1,8 +1,12 @@
+"use client"
 import { Book, Target, Code2, LogOutIcon } from "lucide-react"
 import { NavUser } from "../nav-user"
 import { NavMainItem } from "@/data/definitions"
 import { handleSignOut } from "@/lib/actions"
 import { Suspense } from "react"
+import { useState } from "react"
+import { useEffect } from "react"
+import { Plan } from "@/data/definitions"
 import {
   Sidebar,
   SidebarContent,
@@ -10,9 +14,8 @@ import {
   SidebarHeader,
   SidebarMenuButton,
 } from "@/components/ui/sidebar"
-
-import { fetchUserPlans } from "@/lib/data"
 import NavMain from "./nav-main"
+import PlanLoadingUI from "../plan-loading"
 
 // Menu items.
 const navMain: NavMainItem[] = [
@@ -32,8 +35,34 @@ const navMain: NavMainItem[] = [
   }
 ]
 
-export async function AppSidebar() {
-  const plans = await fetchUserPlans()
+export function AppSidebar() {
+    const [plans, setPlans] = useState<Plan[] | undefined>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+    async function loadPlans() {
+      try {
+        const response = await fetch('/api/user-plans')
+        const data = await response.json()
+        setPlans(data)
+      } catch (error) {
+        console.error('Failed to load plans:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadPlans()
+  }, [])
+    if (loading) {
+    return (
+      <Sidebar className="border-r border-border/50">
+        <SidebarHeader className="border-b border-border/50 bg-card/30 backdrop-blur-sm">
+          <PlanLoadingUI/>
+        </SidebarHeader>
+      </Sidebar>
+    )
+  }
   return (
     <Sidebar defaultValue="true" className="border-r border-border/50 ">
       <SidebarHeader className="border-b border-border/50 bg-card/30 backdrop-blur-sm">

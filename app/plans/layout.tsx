@@ -1,3 +1,4 @@
+"use client"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/sidebar/app-sidebar"
 import {SessionProvider} from "next-auth/react"
